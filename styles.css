@@ -1,0 +1,21 @@
+h1 {
+    text-align: center;
+    color: dodgerblue;
+    border-bottom: 3px solid black;
+}
+
+h5 {
+    color: dodgerblue;
+}
+
+#infoDiv {
+    text-align: center;
+}
+
+#previousGamesDiv {
+    border: 1px dotted lightgray;
+}
+
+#previousGames p:nth-child(2) {
+    background: rgba(30, 144, 255, 0.1);
+}
