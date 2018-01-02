@@ -1,6 +1,6 @@
 # Hangman
 
-A hangman command line tool game (hangman_starter.js) and hangman browser based game (hangman.html)
+A hangman command line tool game (hangman_starter.js) and hangman browser based game (hangman.html).
 
 
 #### App Instructions:
