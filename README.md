@@ -11,5 +11,5 @@ A hangman command line tool game (hangman_starter.js) and hangman browser based 
 ##### Command Line Tool game:
 - node hangman_starter.js
 
-##### Browser
+##### Browser game
 - Double click hangman.html
