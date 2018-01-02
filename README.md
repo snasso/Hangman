@@ -12,4 +12,4 @@ A hangman command line tool game (hangman_starter.js) and hangman browser based 
 - node hangman_starter.js
 
 ##### Browser game
-- Double click hangman.html
+- double click hangman.html to launch
