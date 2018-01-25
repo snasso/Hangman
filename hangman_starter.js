@@ -18,12 +18,9 @@ let pastGuesses = [];
 let pastGames 	= [];
 let cont 		= true;
 
-// guess counter
-let guesses = 0;
-
 
 // End of game Constructor Function
-function GameOver(win, pastGuesses, guesses) {
+function GameOver(win, pastGuesses, word) {
 	let winLose = "Win";
 
 	if (win == true) {
@@ -34,12 +31,13 @@ function GameOver(win, pastGuesses, guesses) {
 
 	this.winLose 		= winLose;
 	this.pastGuesses 	= pastGuesses;
-	this.guesses 		= guesses;
+	this.word			= word.join("");
 
 	return {
 		"winLose": this.winLose,
 		"pastGuesses": this.pastGuesses,
-		"guesses": this.guesses
+		"word": this.word,
+		"guesses": (this.pastGuesses).length
 	};
 }
 
@@ -54,10 +52,11 @@ function startGame() {
 
 		let winLose 		= pastGames[i].winLose;
 		let previousGuesses = pastGames[i].pastGuesses;
+		let word			= pastGames[i].word;
 		let numGuesses 		= pastGames[i].guesses;
 
-		let str = `Game Number ${i + 1}: Won / Lost: ${winLose} | `;
-		str += `Past Guesses: ${previousGuesses} | Number of Guesses: ${numGuesses}`;
+		let str = `Game ${i + 1} -> ${winLose} | Actual Word: ${word} | `;
+		str += `Guesses: ${previousGuesses} | Number of Guesses: ${numGuesses}`;
 
 		console.log(str);
 
@@ -76,20 +75,15 @@ function startGame() {
 			console.log("That is not a valid character. Please select from a-z");
 		} else if (guess.length > 1) {
 			console.log("Please enter only 1 letter at a time.");
+		} else if (pastGuesses.includes(guess)) {
+			console.log("You have already tried this letter.");
 		} else {
+			pastGuesses.push(guess);
 
-			if (pastGuesses.includes(guess)) {
-				console.log("You have already tried this letter.");
-			} else {
-				pastGuesses.push(guess);
-
-				if (!answer.includes(guess)) {
-					nWrong += 1;
-				}
-				guesses += 1;
+			if (!answer.includes(guess)) {
+				nWrong += 1;
 			}
 		}
-
 	}
 	printGameState();
 
@@ -104,7 +98,7 @@ function startGame() {
 			console.log("You have reached the maximum number of guesses (6).");
 		}
 
-		let retObj = new GameOver(win, pastGuesses, guesses);
+		let retObj = new GameOver(win, pastGuesses, answer);
 
 		pastGames.push(retObj);
 	}
@@ -112,19 +106,15 @@ function startGame() {
 
 
 function checkGameOver() {
-	let sortedPastGuesses 	= pastGuesses.sort();
-	let slicedAnswer 		= answer.slice(0);
+	let slicedAnswer = answer.slice(0);
 
 	let uniqueAnswer = slicedAnswer.filter(function (elem, index, self) {
 		return index == self.indexOf(elem);
 	});
 
-	let sortedUniqueAnswer = uniqueAnswer.sort();
-
-	let result = sortedPastGuesses.filter(function (elem) {
-		return sortedUniqueAnswer.indexOf(elem) > -1;
-	}).length == sortedUniqueAnswer.length
-
+	let result = uniqueAnswer.filter(function (elem) {
+		return pastGuesses.indexOf(elem) > -1;
+	}).length == uniqueAnswer.length;
 
 	if (nWrong == 6 || result == true) {
 		return true;
@@ -134,12 +124,12 @@ function checkGameOver() {
 
 
 function printGameState() {
-	if (guesses !== 0) {
+
+	if (pastGuesses.length !== 0) {
 		console.log(`\nPrevious Guesses: ${pastGuesses}`);
 	}
 
 	console.log(`Number of Guesses remaining: ${6 - nWrong}`);
-
 	console.log("\n");
 
 	let str = "";
@@ -196,7 +186,6 @@ function setUpGame() {
 	answer 		= getRandomWord().split(''); // chooses a new word
 	nWrong 		= 0; // resets the total of wrong guesses
 	pastGuesses = []; // empties array of previously guessed letters
-	guesses 	= 0; // resets the total of guesses counter
 }
 
 startGame();

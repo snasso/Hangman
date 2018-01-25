@@ -17,8 +17,6 @@ let pastGuesses = [];
 let pastGames   = [];
 let cont        = true;
 
-/* guess counter */
-let guesses = 0;
 
 document.querySelector("#previousGamesDiv").style.display = "none";
 
@@ -39,24 +37,25 @@ function addClickListener() {
 
 
 /* End of game Constructor Function */
-function GameOver(win, pastGuesses, guesses) {
-    let winLose = "Win";
+function GameOver(win, pastGuesses, word) {
+	let winLose = "Win";
 
-    if (win == true) {
-        winLose = "Won";
-    } else {
-        winLose = "Lost";
-    }
+	if (win == true) {
+		winLose = "Won";
+	} else {
+		winLose = "Lost";
+	}
 
-    this.winLose        = winLose;
-    this.pastGuesses    = pastGuesses;
-    this.guesses        = guesses;
+	this.winLose 		= winLose;
+	this.pastGuesses 	= pastGuesses;
+	this.word			= word.join("");
 
-    return {
-        "winLose": this.winLose,
-        "pastGuesses": this.pastGuesses,
-        "guesses": this.guesses
-    };
+	return {
+		"winLose": this.winLose,
+		"pastGuesses": this.pastGuesses,
+		"word": this.word,
+		"guesses": (this.pastGuesses).length
+	};
 }
 
 
@@ -82,17 +81,13 @@ function game(guess) {
         output = document.createTextNode("That is not a valid character. Please select from a-z");
     } else if (guess.length > 1) {
         output = document.createTextNode("Please enter only 1 letter at a time.");
+    } else if (pastGuesses.includes(guess)) {
+        output = document.createTextNode("You have already tried this letter.");
     } else {
+        pastGuesses.push(guess);
 
-        if (pastGuesses.includes(guess)) {
-            output = document.createTextNode("You have already tried this letter.");
-        } else {
-            pastGuesses.push(guess);
-
-            if (!answer.includes(guess)) {
-                nWrong += 1;
-            }
-            guesses += 1;
+        if (!answer.includes(guess)) {
+            nWrong += 1;
         }
     }
 
@@ -125,7 +120,7 @@ function game(guess) {
 
         addGameOverButton();
 
-        let retObj = new GameOver(win, pastGuesses, guesses);
+        let retObj = new GameOver(win, pastGuesses, answer);
         pastGames.push(retObj);
 
         /* Outputs previous game results */
@@ -139,10 +134,11 @@ function game(guess) {
 
             let winLose         = pastGames[i].winLose;
             let previousGuesses = pastGames[i].pastGuesses;
+            let word			= pastGames[i].word;
             let numGuesses      = pastGames[i].guesses;
 
-            let str = `Game Number ${i + 1}: Won / Lost: ${winLose} | `;
-            str += `Past Guesses: ${previousGuesses} | Number of Guesses: ${numGuesses}`;
+            let str = `Game ${i + 1} -> ${winLose} | Actual Word: ${word} | `;
+            str += `Guesses: ${previousGuesses} | Number of Guesses: ${numGuesses}`;
 
             let pNode = document.createElement("P");
             pNode.innerHTML = `${str}`;
@@ -187,23 +183,20 @@ function addGameOverButton() {
 
 
 function checkGameOver() {
-    let sortedPastGuesses   = pastGuesses.sort();
-    let slicedAnswer        = answer.slice(0);
+	let slicedAnswer = answer.slice(0);
 
-    let uniqueAnswer = slicedAnswer.filter(function (elem, index, self) {
-        return index == self.indexOf(elem);
-    });
+	let uniqueAnswer = slicedAnswer.filter(function (elem, index, self) {
+		return index == self.indexOf(elem);
+	});
 
-    let sortedUniqueAnswer = uniqueAnswer.sort();
+	let result = uniqueAnswer.filter(function (elem) {
+		return pastGuesses.indexOf(elem) > -1;
+	}).length == uniqueAnswer.length;
 
-    let result = sortedPastGuesses.filter(function (elem) {
-        return sortedUniqueAnswer.indexOf(elem) > -1;
-    }).length == sortedUniqueAnswer.length
-
-    if (nWrong == 6 || result == true) {
-        return true;
-    }
-    return false;
+	if (nWrong == 6 || result == true) {
+		return true;
+	}
+	return false;
 }
 
 
@@ -213,7 +206,7 @@ function printGameState() {
     let pNode       = document.createElement("P");
     let textNode    = document.createTextNode("");
 
-    if (guesses !== 0) {
+    if (pastGuesses.length !== 0) {
         textNode = document.createTextNode(`Previous Guesses: ${pastGuesses}`);
         pNode.appendChild(textNode);
         document.querySelector("#infoDiv").appendChild(pNode);
@@ -285,5 +278,4 @@ function setUpGame() {
     answer      = getRandomWord().split(''); // chooses a new word
     nWrong      = 0; // reset the total of wrong guesses
     pastGuesses = []; // empties our array of previously guessed letters
-    guesses     = 0; // resets the total of guesses counter
 }
